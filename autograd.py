@@ -27,6 +27,22 @@ class Value:
         out._backward = _backward
         return out
 
+    def relu(self):
+        out = Value(max(0.0, self.data), (self,), "ReLU")
+        def _backward():
+            self.grad += (1.0 if out.data > 0 else 0.0) * out.grad
+        out._backward = _backward
+        return out
+
+    def tanh(self):
+        x = self.data
+        t = (math.exp(2*x) - 1) / (math.exp(2*x) + 1)
+        out = Value(t, (self,), "tanh")
+        def _backward():
+            self.grad += (1.0 - t**2) * out.grad
+        out._backward = _backward
+        return out
+
     def backward(self):
         topo = []
         visited = set()
